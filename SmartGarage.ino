@@ -1,59 +1,60 @@
 
 
-// Replace BLYNK_CODE with unique code from Blynk app after registering.
-// Add wifi credentials
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
-#define TRIGGER 5
-#define ECHO    4
 
-char auth[] = "BLYNK_CODE";
+// You should get Auth Token in the Blynk App.
+// Go to the Project Settings (nut icon).
+char auth[] = "BLYNK_CODE";//Replace code
 
 //WiFi credentials.
 
-char ssid[] = "WiFi NAME";
-char pass[] = "WiFi PASSWORD";
+char ssid[] = "Name";// wifi name
+char pass[] = "Password";// wifi password
+
+const int trigPin = 2;  //D4
+const int echoPin = 0;  //D3
+
+long duration;
+int distance;
+
+WidgetLCD lcd(V3);
 
 void setup()
 {
 
   
   Blynk.begin(auth, ssid, pass);
-  pinMode(0, OUTPUT);
-  pinMode(15, OUTPUT);
-  pinMode(TRIGGER, OUTPUT);
-  pinMode(ECHO, INPUT);
-  
+  pinMode(D1, OUTPUT);
+  pinMode(D2, OUTPUT);
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+  Serial.begin(9600); // Starts the serial communication
 }
 
 void loop()
 {
-  
   Blynk.run();
-  
-  
-  long duration, distance;
-  
   // Clears the trigPin
-  digitalWrite(TRIGGER, LOW);  
-  delayMicroseconds(2); 
-  
-  
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
   // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(TRIGGER, HIGH);
-  delayMicroseconds(10); 
-  digitalWrite(TRIGGER, LOW);
-  
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
   // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(ECHO, HIGH);
+  duration = pulseIn(echoPin, HIGH);
   
   // Calculating the distance
-  // distance is now in centimeters
-  distance = (duration/2) / 29.1;
-  
-  if (distance > 100){
-  lcd.print(0,0, "Door Open  ");
-  }else {
-   lcd.print(0,0, "Door Closed");
+  distance= duration*0.034/2;
+  // Prints the distance on the Serial Monitor
+  if (distance > 90) {
+   lcd.print(0,0, "Door Closed  ");
+  }  else {
+   lcd.print(0,0, "Door Open");
   }
+  delay(1000);
+  
 }
